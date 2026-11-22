@@ -15,7 +15,7 @@ I ran the load and validation scripts inside Docker. The load wrote **403 rows**
 
 ### Acknowledgements
 
-I built on Taiwo Hassan  stock pipeline project. I added NVDA, implemented a 20-trading-day moving average, and added a flag for daily closing-price moves of at least 5% in either direction.
+I built on Taiwo Hassan  stock pipeline project guidance . I added NVDA, implemented a 20-trading-day moving average, and added a flag for daily closing-price moves of at least 5% in either direction.
 
 
 
