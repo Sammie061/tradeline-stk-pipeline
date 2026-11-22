@@ -1,3 +1,24 @@
+
+## Stock pipeline run
+
+The pipeline extracts daily stock prices, transforms them with PySpark, loads them into PostgreSQL, and validates the loaded data.
+
+### Airflow workflow
+
+![Airflow grid showing a successful run of the stock pipeline](docs/images/airflow-successful-run.png)
+
+The rightmost column shows a successful run. Each green square corresponds to one task: `extract`, `transform`, `load`, and `validate`.
+
+### Load and validation results
+
+I ran the load and validation scripts inside Docker. The load wrote **403 rows** to the PostgreSQL table `daily_prices`. Validation passed for all four stocks: **AAPL, GOOGL, MSFT, and NVDA**.
+
+### Acknowledgements
+
+I built on Taiwo Hassan  stock pipeline project. I added NVDA, implemented a 20-trading-day moving average, and added a flag for daily closing-price moves of at least 5% in either direction.
+
+
+
 # Stock Pipeline: Docker + Airflow + PySpark + Postgres
 
 A small data pipeline that runs entirely inside Docker.
@@ -54,14 +75,9 @@ docker compose exec airflow python -m scripts.extract   # run one step by hand
 
 ## If something goes wrong
 
-- **Port 8080 or 5433 already in use:** change the left-hand number in `ports:` in `docker-compose.yml`.
+- **Port 8081 or 5433 already in use:** change the left-hand number in `ports:` in `docker-compose.yml`.
 - **Task fails with "API did not return prices":** you hit the free API limit, or the key is wrong. Empty the key in `.env` to use sample data, then restart.
 - **Permission denied writing to `data/` (Linux only):** run `chmod -R 777 data`.
 - **Changed `.env`:** run `docker compose up -d --force-recreate airflow`.
 - **DAG not showing:** wait about a minute, or check `docker compose logs airflow` for a Python error.
 
-## Practice ideas
-
-1. Add a fourth stock (`SYMBOLS` in `.env`) and see it flow through.
-2. Add a `ma_20` column in `transform.py`.
-3. Add a validation check that no `close` price is above 10,000.

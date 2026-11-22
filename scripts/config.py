@@ -2,7 +2,7 @@
 import os
 
 # --- Which stocks to pull -------------------------------------------------
-SYMBOLS = os.getenv("SYMBOLS", "AAPL,MSFT,GOOGL").split(",")
+SYMBOLS = os.getenv("SYMBOLS", "AAPL,MSFT,GOOGL,NVDA").split(",")
 
 # --- API (leave the key empty to use the sample files instead) ------------
 API_KEY = os.getenv("ALPHAVANTAGE_API_KEY", "")

@@ -76,9 +76,27 @@ def run_transform():
     )
     df = df.withColumn("ma_5", F.round(F.avg("close").over(w.rowsBetween(-4, 0)), 2))
 
+    
+
+    # 6. Average the latest 20 closes for each stock.
+    last_20 = w.rowsBetween(-19,0)
+    df = df.withColumn("ma_20", F.when(F.count("close").over(last_20) == 20,
+    F.round(F.avg("close").over(last_20), 4), ))
+
+
+
+    # 7. Flag a price increase or decrease f at least 5%
+
+    current_price = F.col("close").cast("decimal(20, 8)")
+    previous_price = F.col("prev_close").cast("decimal(20, 8)")
+
+    df = df.withColumn("large_move_flag", F.abs(current_price - previous_price) * 100 >= previous_price * 5)
+
     df = df.drop("prev_close").orderBy("symbol", "trade_date")
 
-    # 6. Save the clean data as Parquet for the next step
+
+
+    # 8. Save the clean data as Parquet for the next step
     os.makedirs(PROCESSED_DIR, exist_ok=True)
     df.write.mode("overwrite").parquet(f"{PROCESSED_DIR}/daily_prices")
     print(f"Saved {df.count()} clean rows to {PROCESSED_DIR}/daily_prices")

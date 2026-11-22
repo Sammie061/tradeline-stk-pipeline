@@ -18,6 +18,19 @@ def run_load():
     )
 
     df = spark.read.parquet(f"{PROCESSED_DIR}/daily_prices")
+    # Each stock should have one record per trading date.
+    duplicate_keys = (
+        df.groupBy("symbol", "trade_date")
+        .count()
+        .filter("count > 1")
+    )
+
+    if duplicate_keys.limit(1).count() > 0:
+        duplicate_keys.show(10, truncate=False)
+        spark.stop()
+        raise ValueError(
+            "Load cancelled: duplicate symbol/trade_date records found"
+        )
 
     # "overwrite" + "truncate" = empty the table and refill it.
     # This means running the pipeline twice will NOT create duplicate rows.

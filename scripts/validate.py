@@ -29,8 +29,23 @@ def run_validate():
     if missing:
         raise ValueError(f"Validation failed: no data for {missing}")
 
+
+    
+    # Check 4: closing prices must be greater than zero
+    cur.execute(
+        f"SELECT COUNT(*) FROM {TABLE_NAME} WHERE close <= 0"
+    )
+    invalid_price_count = cur.fetchone()[0]
+
+    if invalid_price_count > 0:
+        raise ValueError(
+            f"Validation failed: {invalid_price_count} rows "
+            "have zero or negative closing prices"
+        )
+
     print(f"Validation passed: {row_count} rows, stocks = {sorted(found)}")
     conn.close()
+
 
 
 if __name__ == "__main__":
